@@ -1,32 +1,17 @@
 from flask import Flask, render_template, request, Markup
 import newspaper
- 
-import pykakasi
- 
-# Initialize pykakasi with options
-kks = pykakasi.kakasi()
-#kks.set_options(kakasi_no_defaults=True, mode='J', output_type='hiragana')
- 
-import re
- 
-# Define a regular expression pattern for Kanji characters
-kanji_pattern = re.compile(r'[\u4e00-\u9faf]')
- 
-# Define a function to check if a given string contains any Kanji characters
-def contains_kanji(text):
-    return bool(kanji_pattern.search(text))
- 
+import re 
+from pykakasi_helper import convert, contains_kanji
+
 # Define a function to add Furigana to a given text
 def add_furigana(text):
     # Convert Japanese text to Hiragana using pykakasi
-    hiragana_text = kks.convert(text)
+    hiragana_text = convert(text, all_fields=False, kanji_only=False)
     print(hiragana_text)
     txt = ''
-    # <p>日本語の<ruby>漢字<rt>かんじ</rt></ruby>は難しいです。</p>
     for replacement in hiragana_text:
         if contains_kanji(replacement['orig']):
             txt += f"""<ruby>{replacement['orig']}<rt><input type="text" oninput="checkFurigana(this, '{replacement['hira']}')" /></rt></ruby>"""
-            #onkeypress="handleKeyPress(event)">
         else:
             txt += replacement['orig']
     return txt
