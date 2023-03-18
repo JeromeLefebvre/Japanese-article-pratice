@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Article Parser</title>
+  <style>
+    input {
+      width: 50%;
+      margin: 10px;
+    }
+    rt {
+      margin: 10px;
+    }
+    p {
+      line-height: 5;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<script>
+  function checkFurigana(input, rtText) {
+    if (input.value == rtText) {
+      input.style.color = 'green';
+      correct = true;
+    } else {
+      input.style.color = 'red';
+      correct = false;
+    }
+    $.ajax({
+      type: "POST",
+      url: "/success",
+      data: { "kanji": rtText, "correct":  },
+      success: function (response) {
+        // Handle the response from Flask
+        console.log(response);
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  }
+</script>
+
+<body>
+  <h1>Article Parser</h1>
+  <form method="POST">
+    <label for="url">Article URL:</label>
+    <input type="text" name="url">
+    <button type="submit">Parse</button>
+  </form>
+  {% if article_text %}
+  <h2>Article Text:</h2>
+  <p>{{ article_text }}</p>
+  {% endif %}
+</body>
+
+</html>
