@@ -2,16 +2,22 @@ from flask import Flask, render_template, request, Markup
 import newspaper
 import re 
 from pykakasi_helper import convert, contains_kanji
+from SM2 import Learnerdatabase
 
 # Define a function to add Furigana to a given text
 def add_furigana(text):
+    L = Learnerdatabase()
     # Convert Japanese text to Hiragana using pykakasi
     hiragana_text = convert(text, all_fields=False, kanji_only=False)
     print(hiragana_text)
     txt = ''
     for replacement in hiragana_text:
         if contains_kanji(replacement['orig']):
-            txt += f"""<ruby>{replacement['orig']}<rt><input type="text" oninput="checkFurigana(this, '{replacement['hira']}')" /></rt></ruby>"""
+            should_study = L.should_study(replacement['orig'])
+            if should_study:
+                txt += f"""<ruby>{replacement['orig']}<rt><input type="text" oninput="checkFurigana(this, '{replacement['hira']}')" /></rt></ruby>"""
+            else:
+                txt += replacement['orig']
         else:
             txt += replacement['orig']
     return txt
